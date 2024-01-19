@@ -13,7 +13,7 @@ Morphological layers add-on for Tensorflow and Morphological Pruning Tools
   <dt> y_test </dt>
   <dt> batch_size </dt>
   <dt> morph_epochs: </dt>
-    <dd> number of epochs to train the morphological model </dd>>
+    <dd> number of epochs to train the morphological model </dd>
   <dt> mlp_epochs: </dt>
     <dd> number of epochs to train the model when pruning is done </dd>
   <dt> mlp_epochs_refit: </dt>
