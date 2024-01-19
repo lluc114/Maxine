@@ -2,24 +2,36 @@
 Morphological layers add-on for Tensorflow and Morphological Pruning Tools
 
 ## Pruning Tool Usage
-Arguments:
-baselineMode
-x_train
-y_train
-x_val
-y_val
-x_test
-y_test
-batch_size
-morph_epochs: number of epochs to train the morphological model
-mlp_epochs: number of epochs to train the model when pruning is done
-mlp_epochs_refit: number of epochs to train the model when a pruing masc is applied to one of its layers
-p: minim usability parameter (%). Ignored when extreme=False
-pList: list of p parameters, one for each layer, except for the output layer that remains unpruned. Ignored when extreme=False
-optimizer_config: the serialized optimizer for training
-preLoad: if True you can skip the morphological training
-activLists: list of activations (true/false) (MxQ) for each layer of the morphological model. Ignored when preLoad=False
-activCounts: list of number of times that each weight has been used (MxQ) for each layer of the morphological model. Ignored when preLoad=False
+<b>Arguments:</b>
+<dl>
+  <dt> baselineMode </dt>
+  <dt> x_train </dt>  
+  <dt> y_train </dt>
+  <dt> x_val </dt>
+  <dt> y_val </dt>
+  <dt> x_test </dt>
+  <dt> y_test </dt>
+  <dt> batch_size </dt>
+  <dt> morph_epochs: </dt>
+    <dd> number of epochs to train the morphological model </dd>>
+  <dt> mlp_epochs: </dt>
+    <dd> number of epochs to train the model when pruning is done </dd>
+  <dt> mlp_epochs_refit: </dt>
+    <dd> number of epochs to train the model when a pruing masc is applied to one of its layers </dd>
+  <dt> p: </dt>
+    <dd> minim usability parameter (%). Ignored when extreme=False </dd>
+  <dt> pList: </dt>
+    <dd> list of p parameters, one for each layer, except for the output layer that remains unpruned. Ignored when extreme=False </dd>
+  <dt> optimizer_config: </dt>
+    <dd> the serialized optimizer for training </dd>
+  <dt> preLoad: </dt>
+    <dd> if True you can skip the morphological training </dd>
+  <dt> activLists: </dt>
+    <dd> list of activations (true/false) (MxQ) for each layer of the morphological model. Ignored when preLoad=False </dd>
+  <dt> activCounts: </dt> 
+    <dd> list of number of times that each weight has been used (MxQ) for each layer of the morphological model. Ignored when preLoad=False </dd>
+</dl>
+
 
 To use the pruning tool with a different minimum usability p for each layer 
 ```
