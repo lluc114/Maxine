@@ -185,7 +185,7 @@ def pruning_MLP(model, x_train, y_train, x_val, y_val, x_test, y_test, batch_siz
             ) #from logits = Ture if no activation function on the output
         model_tool.build(input_shape=x_train.shape)
         # model_tool.layers[layer_config['n_layer']].set_weights(layer.get_weights()) # Set weights of the given model
-        model_tool.fit(x_train, y_train, batch_size=batch_size, epochs=mlp_epochs_refit, validation_data=(x_val, y_val)) # Refit model with the masc
+        model_tool.fit(x_train, y_train, batch_size=batch_size, epochs=mlp_epochs_refit, validation_data=(x_val, y_val), verbose=2) # Refit model with the masc
 
         if i == (layers_count - 2): # The next layer is the output layer -> end pruning
             break
