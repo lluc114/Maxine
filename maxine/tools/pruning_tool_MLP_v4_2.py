@@ -159,9 +159,9 @@ def pruning_MLP(model, x_train, y_train, x_val, y_val, x_test, y_test, batch_siz
         pruned_params = pruned_params + masc.size - np.count_nonzero(masc)
 
         new_w = np.multiply(masc, layer.get_weights()[0])
-        bias = layer.get_weights()[1]
-
+        
         if (layer_config['use_bias']):
+            bias = layer.get_weights()[1]
             model_layers.insert(layer_config['n_layer'], tf.keras.layers.Dense(layer_config['units'], activation=layer_config['activation'], use_bias=True, kernel_initializer=Weights(new_w), kernel_constraint=PruningConstraint(masc), bias_initializer=Weights(bias)))
         else:
             model_layers.insert(layer_config['n_layer'], tf.keras.layers.Dense(layer_config['units'], activation=layer_config['activation'], use_bias=False, kernel_initializer=Weights(new_w), kernel_constraint=PruningConstraint(masc)))
