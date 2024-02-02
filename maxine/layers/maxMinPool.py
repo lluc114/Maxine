@@ -14,6 +14,7 @@ class MaxMinPool(keras.layers.Layer):
                 raise Exception("M is greater than the number of neurons")
             self.M = M
 
+
     def build(self, input_shape):
         
         self.w = self.add_weight(
@@ -29,3 +30,4 @@ class MaxMinPool(keras.layers.Layer):
         hv = tf.reduce_max(sum[..., :self.M], axis=-2)
         hw = tf.reduce_min(sum[..., self.M:], axis=-2)
         return self.activation(tf.concat([hv,hw], axis=1))
+    

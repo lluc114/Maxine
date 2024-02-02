@@ -124,6 +124,8 @@ def pruning_MLP(model, x_train, y_train, x_val, y_val, x_test, y_test, batch_siz
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                 metrics=['accuracy'])
         
+        morph_model.run_eagerly = False
+        
         morph_model.build(input_shape=train_data_morph.shape)
         morph_model.summary()
         

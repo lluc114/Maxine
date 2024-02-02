@@ -6,29 +6,53 @@ import maxine
 #--------------------------
 # FORMWARD STEP OF THE SOFTMAXMIN NET
 #--------------------------
-def forward_pass(data, weights, M_max, units, dtype):
-    activation_list = np.zeros_like(weights, dtype=int)
-    activation_count = np.zeros_like(weights, dtype=int)
-    max_index = np.arange(0, M_max, dtype=int)
-    min_index = np.arange(M_max, units, dtype=int)
-    t_weights = tf.convert_to_tensor(weights, dtype=dtype)
+# def forward_pass(data, weights, M_max, units, dtype):
+#     activation_list = np.zeros_like(weights, dtype=int)
+#     activation_count = np.zeros_like(weights, dtype=int)
+#     max_index = np.arange(0, M_max, dtype=int)
+#     min_index = np.arange(M_max, units, dtype=int)
+#     t_weights = tf.convert_to_tensor(weights, dtype=dtype)
 
-    for input in data:
-        input_expanded = tf.expand_dims(input, axis=-1)
-        sum = tf.add(input_expanded, t_weights)
-        max_pos = tf.argmax(sum[..., :M_max], axis=0)
-        min_pos = tf.argmin(sum[..., M_max:], axis=0)
+#     for input in data:
+#         input_expanded = tf.expand_dims(input, axis=-1)
+#         sum = tf.add(input_expanded, t_weights)
+#         max_pos = tf.argmax(sum[..., :M_max], axis=0)
+#         min_pos = tf.argmin(sum[..., M_max:], axis=0)
 
-        _max_pos = max_pos.numpy()
-        _min_pos = min_pos.numpy()
+#         _max_pos = max_pos.numpy()
+#         _min_pos = min_pos.numpy()
 
-        activation_list[_max_pos, max_index] = 1
-        activation_list[_min_pos, min_index] = 1
+#         activation_list[_max_pos, max_index] = 1
+#         activation_list[_min_pos, min_index] = 1
 
-        activation_count[_max_pos, max_index] += 1
-        activation_count[_min_pos, min_index] += 1
+#         activation_count[_max_pos, max_index] += 1
+#         activation_count[_min_pos, min_index] += 1
 
-    return activation_list, activation_count
+#     return activation_list, activation_count
+
+def forward_pass(data, weights, M_max, units, batch_size, dtype):
+    shape = (weights.shape[1], weights.shape[0])
+    activation_count = tf.zeros(shape=shape)
+    weights = tf.expand_dims(weights, axis = 0)
+    
+    for input_batch in data.batch(batch_size):
+        input_expanded = tf.expand_dims(input_batch, axis=-1)
+        sum = tf.add(input_expanded, weights)
+        sum_1 = sum[..., :M_max]
+        sum_2 = sum[..., M_max:]
+        max_pos = tf.math.argmax(sum_1, axis=1)
+        min_pos = tf.math.argmin(sum_2, axis=1)
+        activ_count_1 = tf.one_hot(max_pos, depth=shape[1])
+        activ_count_2 = tf.one_hot(min_pos, depth=shape[1])
+        _activation_count = tf.concat([activ_count_1, activ_count_2], axis=1)
+        _activation_count = tf.reduce_sum(_activation_count, axis=0)
+        activation_count = tf.add(activation_count, _activation_count)
+        
+    activation_count = tf.transpose(activation_count)
+    activation_list = tf.cast(activation_count, dtype=tf.bool)
+    
+
+    return activation_list.numpy(), activation_count.numpy()
 
 
 def pruning_morphological(trained_model, x_train, y_train, x_val, y_val, x_test, y_test, p, batch_size, extreme=False, optimizer=None, metrics=None, loss=None, finetuning=False, preLoad=False, activLists=[], activCounts=[]):
@@ -94,7 +118,7 @@ def pruning_morphological(trained_model, x_train, y_train, x_val, y_val, x_test,
     # COMPUTE MASCS
     #--------------------------
     # Training data
-    train_data=tf.concat([x_train, x_val], axis=0)
+    train_data=tf.data.Dataset.from_tensor_slices(tf.concat([x_train, x_val], axis=0))
 
     #input_morph_layers = []
     hp_masc = []
@@ -127,7 +151,7 @@ def pruning_morphological(trained_model, x_train, y_train, x_val, y_val, x_test,
             activation_list = activLists[nLayer]
             activation_count = activCounts[nLayer]
         else:
-            activation_list, activation_count = forward_pass(input_morph_layer, morph_layer_weights, M_max, layer_config['units'], dtype)
+            activation_list, activation_count = forward_pass(input_morph_layer, morph_layer_weights, M_max, layer_config['units'], batch_size, dtype)
 
         print("Forward pass ended...")
 
